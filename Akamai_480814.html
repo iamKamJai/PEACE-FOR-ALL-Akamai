@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PEACE FOR ALL - ASCII Preview</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      text-align: center;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .ascii {
+      white-space: pre;
+      font-size: 18px;
+      line-height: 22px;
+      background: linear-gradient(90deg, #ffcc00, #ff3366, #33ccff, #66ff66);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientMove 4s infinite linear;
+      background-size: 400% 100%;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="screen" class="ascii"></div>
+
+  <script>
+    const frames = [
+`   * * * * * * * * * * * * * * * *
+   *                             *
+   *        PEACE  FOR  ALL      *
+   *                             *
+   * * * * * * * * * * * * * * * *`,
+
+`   ********************************
+   *                              *
+   *    ☮    PEACE  FOR  ALL   ☮   *
+   *                              *
+   ********************************`,
+
+`   ████████████████████████████████
+   █                              █
+   █       PEACE ☮ FOR ALL        █
+   █                              █
+   ████████████████████████████████`
+    ];
+
+    let idx = 0;
+    const screen = document.getElementById("screen");
+
+    function renderFrame() {
+      screen.textContent = frames[idx];
+      idx = (idx + 1) % frames.length;
+    }
+
+    setInterval(renderFrame, 1200);
+    renderFrame();
+  </script>
+</body>
+</html>
+
+
