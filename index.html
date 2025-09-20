@@ -1,73 +1,259 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>PEACE FOR ALL - ASCII Preview</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PEACE FOR ALL — 預覽與 Base64 解碼器</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: monospace;
-      text-align: center;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    :root{
+      --bg:#071014;
+      --panel:#0d1720;
+      --muted:#9aa4af;
+      --ok:#34d399;
+      --accent1:#fde047;
+      --accent2:#fb7185;
+      --accent3:#60a5fa;
+      --accent4:#22c55e;
     }
-    .ascii {
-      white-space: pre;
-      font-size: 18px;
-      line-height: 22px;
-      background: linear-gradient(90deg, #ffcc00, #ff3366, #33ccff, #66ff66);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: gradientMove 4s infinite linear;
-      background-size: 400% 100%;
+    html,body{height:100%;margin:0;background:var(--bg);color:#e6eef6;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px;}
+    h1{margin:0 0 12px;font-size:20px}
+    .grid{display:grid;grid-template-columns:1fr 460px;gap:16px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:14px;border-radius:10px;}
+    label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+    textarea,input[type="text"]{width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-family:inherit}
+    button{background:#0ea5a4;border:none;padding:8px 12px;border-radius:8px;color:#022;cursor:pointer}
+    button:active{transform:translateY(1px)}
+    .ascii{white-space:pre;font-size:14px;line-height:16px;font-weight:600;letter-spacing:1px;text-align:center;padding:12px;}
+    .gradientText{
+      font-weight:900;font-size:26px;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3),var(--accent4));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-size:300% 100%;animation:move 6s linear infinite;
     }
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+    @keyframes move{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .log{height:260px;overflow:auto;background:rgba(255,255,255,0.01);padding:10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.02);font-size:13px}
+    .muted{color:var(--muted);font-size:13px}
+    .footer{margin-top:12px;color:var(--muted);font-size:13px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
-  <div id="screen" class="ascii"></div>
+  <div class="wrap">
+    <h1>PEACE FOR ALL — 終端模擬 & Base64 解碼器</h1>
+    <div class="grid">
+      <!-- 左側：ASCII / 預覽 -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div class="muted">終端機預覽</div>
+            <div class="gradientText" aria-hidden="true">☮ PEACE FOR ALL ☮</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">動畫速度</div>
+            <input id="speed" type="range" min="200" max="2000" value="900" />
+          </div>
+        </div>
+
+        <div id="ascii" class="ascii" aria-live="polite" role="status"></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+          <button id="startBtn">開始動畫</button>
+          <button id="stopBtn">停止動畫</button>
+          <div style="flex:1"></div>
+          <div class="muted">模擬終端色彩與文字輸出</div>
+        </div>
+
+        <div class="footer">說明：上方為模擬動畫，不需要執行原始 bash。若你有 base64 字串，可在右側貼上並嘗試解碼。</div>
+      </div>
+
+      <!-- 右側：Base64 輸入與解碼 -->
+      <div class="card">
+        <label for="b64">Base64 字串（可貼上你的原始內容）</label>
+        <textarea id="b64" rows="8" placeholder="把 base64 字串貼在這裡...">IyEvYmluL2Jhc2gKCiMgQ29uZ3Jhd
+HVsYXRpb25zISBZb3UgZm91bmQgdGhlIGVhc3RlciBlZ2chIOKdpO+4jwojIOOBiuO
+CgeOBp+OBqOOBhuOBlOOBluOBhOOBvuOBme+8gemaoOOBleOCjOOBn+OCteODl+OD
+qeOCpOOCuuOCkuimi+OBpOOBkeOBvuOBl+OBn++8geKdpO+4jwoKIyBEZWZpbmUgd
+GhlIHRleHQgdG8gYW5pbWF0ZQp0ZXh0PSLimaVQRUFDReKZpUZPUuKZpUFMTOKZpV
+BFQUNF4pmlRk9S4pmlQUxM4pmlUEVBQ0XimaVGT1LimaVBTEzimaVQRUFDReKZpUZ
+PUuKZpUFMTOKZpVBFQUNF4pmlRk9S4pmlQUxM4pmlIgoKIyBHZXQgdGVybWluYWwg
+ZGltZW5zaW9ucwpjb2xzPSQodHB1dCBjb2xzKQpsaW5lcz0kKHRwdXQgbGluZXMpC
+gojIENhbGN1bGF0ZSB0aGUgbGVuZ3RoIG9mIHRoZSB0ZXh0CnRleHRfbGVuZ3RoPS
+R7I3RleHR9CgojIEhpZGUgdGhlIGN1cnNvcgp0cHV0IGNpdmlzCgojIFRyYXAgQ1RS
+TCtDIHRvIHNob3cgdGhlIGN1cnNvciBiZWZvcmUgZXhpdGluZwp0cmFwICJ0cHV0I
+GNub3JtOyBleGl0IiBTSUdJTlQKCiMgU2V0IGZyZXF1ZW5jeSBzY2FsaW5nIGZhY3R
+vcgpmcmVxPTAuMgoKIyBJbmZpbml0ZSBsb29wIGZvciBjb250aW51b3VzIGFuaW1hd
+Glvbgpmb3IgKCggdD0wOyA7IHQrPTEgKSk7IGRvCiAgICAjIEV4dHJhY3Qgb25lIGN
+oYXJhY3RlciBhdCBhIHRpbWUKICAgIGNoYXI9IiR7dGV4dDp0ICUgdGV4dF9sZW5nd
+Gg6MX0iCiAgICAKICAgICMgQ2FsY3VsYXRlIHRoZSBhbmdsZSBpbiByYWRpYW5zCiA
+gICBhbmdsZT0kKGVjaG8gIigkdCkgKiAkZnJlcSIgfCBiYyAtbCkKCiAgICAjIENhb
+GN1bGF0ZSB0aGUgc2luZSBvZiB0aGUgYW5nbGUKICAgIHNpbmVfdmFsdWU9JChlY2
+hvICJzKCRhbmdsZSkiIHwgYmMgLWwpCgogICAgIyBDYWxjdWxhdGUgeCBwb3NpdGl
+vbiB1c2luZyB0aGUgc2luZSB2YWx1ZQogICAgeD0kKGVjaG8gIigkY29scyAvIDIpIC
+sgKCRjb2xzIC8gNCkgKiAkc2luZV92YWx1ZSIgfCBiYyAtbCkKICAgIHg9JChwcmlu
+dGYgIiUuMGYiICIkeCIpCgogICAgIyBFbnN1cmUgeCBpcyB3aXRoaW4gdGVybWluY
+WwgYm91bmRzCiAgICBpZiAoKCB4IDwgMCApKTsgdGhlbiB4PTA7IGZpCiAgICBpZi
+AoKCB4ID49IGNvbHMgKSk7IHRoZW4geD0kKChjb2xzIC0gMSkpOyBmaQoKICAgICM
+gQ2FsY3VsYXR1IGNvbG9yIGdyYWRpZW50IGJldHdlZW4gMTIgKGN5YW4pIGFuZCAyM
+DggKG9yYW5nZSkKICAgIGNvbG9yX3N0YXJ0PTEyCiAgICBjb2xvcl9lbmQ9MjA4CiA
+gICBjb2xvcl9yYW5nZT0kKChjb2xvcl9lbmQgLSBjb2xvcl9zdGFydCkpCiAgICBjb
+2xvcj0kKChjb2xvcl9zdGFydCArIChjb2xvcl9yYW5nZSAqIHQgLyBsaW5lcykgJSBj
+b2xvcl9yYW5nZSkpCgogICAgIyBQcmludCB0aGUgY2hhcmFjdGVyIHdpdGggMjU2L
+WNvbG9yIHN1cHBvcnQKICAgIGVjaG8gLW5lICJcMDMzWzM4OzU7JHtjb2xvcn1tIiQ
+odHB1dCBjdXAgJHQgJHgpIiRjaGFyXDAzM1swbSIKCiAgICAjIExpbmUgZmVlZCB0b
+yBtb3ZlIGRvd253YXJkCiAgICBlY2hvICIiCgpkb25lCgo=</textarea>
+
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <button id="decodeBtn">清理並嘗試解碼</button>
+          <button id="showCleanBtn">顯示清理後的 Base64</button>
+          <div style="flex:1"></div>
+          <div class="muted">提示：若原字串含非 Base64 字元，解碼可能仍不完整。</div>
+        </div>
+
+        <label for="decoded" style="margin-top:10px">解碼結果（若成功，會顯示原始腳本或文字）</label>
+        <pre id="decoded" class="log" aria-live="polite"></pre>
+
+        <label for="clean" style="margin-top:8px">清理後的 Base64（只保留 A–Z a–z 0–9 + / =）</label>
+        <textarea id="clean" rows="4"></textarea>
+
+        <div style="margin-top:10px" class="muted">註：此工具只做簡單清理與純客戶端解碼，若字串被損毀或包含非 ASCII 替代字元（例如西里爾字母），可能需要手動校正或更進階的還原步驟。</div>
+      </div>
+    </div>
+
+    <div style="max-width:1100px;margin:16px auto;text-align:center;color:var(--muted);font-size:13px">
+      你可以直接把整個檔案存成 <code>index.html</code> 並用瀏覽器開啟。祝你解碼順利！ — 若要我直接幫你把清理後的結果進一步嘗試修復文字，我可以再幫你做自動替換候選（例如西里爾字母 → 拉丁字母）。
+    </div>
+  </div>
 
   <script>
+    /**************************************************************************
+     * ASCII 動畫區塊（左側）
+     *
+     * 這段 JS 會用一組 frames（多個 ASCII 字串）每隔 interval 切換，
+     * 並用顏色 bar 模擬終端機輸出（用文字長度變化模擬進度）。
+     **************************************************************************/
+    const asciiElem = document.getElementById('ascii');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const speedInput = document.getElementById('speed');
+
+    // 幾個示範 frame（可自行擴充）
     const frames = [
-`   * * * * * * * * * * * * * * * *
-   *                             *
-   *        PEACE  FOR  ALL      *
-   *                             *
-   * * * * * * * * * * * * * * * *`,
-
-`   ********************************
-   *                              *
-   *    ☮    PEACE  FOR  ALL   ☮   *
-   *                              *
-   ********************************`,
-
-`   ████████████████████████████████
-   █                              █
-   █       PEACE ☮ FOR ALL        █
-   █                              █
-   ████████████████████████████████`
+`  **************************************
+  *                                    *
+  *        ☮    PEACE FOR ALL     ☮    *
+  *                                    *
+  **************************************`,
+`  +------------------------------------+
+  |                                    |
+  |    PEACE ☮ FOR ALL   —   be kind   |
+  |                                    |
+  +------------------------------------+`,
+`  █████████████████████████████████████
+  █                                    █
+  █     ☮   PEACE  FOR  ALL   ☮        █
+  █                                    █
+  █████████████████████████████████████`
     ];
 
-    let idx = 0;
-    const screen = document.getElementById("screen");
+    let asciiTimer = null;
+    let frameIndex = 0;
 
-    function renderFrame() {
-      screen.textContent = frames[idx];
-      idx = (idx + 1) % frames.length;
+    function renderAscii() {
+      // 顯示 frame 與模擬動態 bar（以 frameIndex 生成漸變長度）
+      const f = frames[frameIndex % frames.length];
+      const barLen = (frameIndex % 10) + 1;
+      const bar = '■'.repeat(barLen);
+      asciiElem.textContent = ${f}\n\n   ${bar}   ${new Date().toLocaleTimeString()};
+      frameIndex++;
     }
 
-    setInterval(renderFrame, 1200);
-    renderFrame();
+    function startAscii(){
+      if(asciiTimer) return;
+      renderAscii();
+      asciiTimer = setInterval(renderAscii, Number(speedInput.value || 900));
+    }
+    function stopAscii(){
+      if(!asciiTimer) return;
+      clearInterval(asciiTimer);
+      asciiTimer = null;
+    }
+
+    startBtn.addEventListener('click', startAscii);
+    stopBtn.addEventListener('click', stopAscii);
+    speedInput.addEventListener('input', ()=> {
+      if(asciiTimer){ stopAscii(); startAscii(); }
+    });
+
+    // 頁面載入自動啟動
+    startAscii();
+
+    /**************************************************************************
+     * Base64 解碼器（右側）
+     *
+     * - cleanBase64(s): 只保留 base64 字元 (A-Za-z0-9+/=)
+     * - decodeBase64(s): 使用 window.atob 解碼（若為 UTF-8 需要再轉回 Unicode）
+     **************************************************************************/
+
+    // 只保留 Base64 字元（和 = padding）
+    function cleanBase64(s){
+      // 移除所有非 base64 的字元（包含空白、換行、奇怪符號）
+      return s.replace(/[^A-Za-z0-9+/=]/g, '');
+    }
+
+    // 將 atob (binary string) 轉為 UTF-8 字串
+    function b64DecodeUnicode(str) {
+      try {
+        // atob 解出二進位字串（每字元為一 byte）
+        const binary = atob(str);
+        // 將每個字元的 charCode 轉為百分位 escape，再 decodeURIComponent 得到 utf-8
+        const bytes = Array.prototype.map.call(binary, function(ch) {
+          const code = ch.charCodeAt(0);
+          return '%' + ('00' + code.toString(16)).slice(-2);
+        }).join('');
+        return decodeURIComponent(bytes);
+      } catch (e) {
+        // 若 atob 失敗，回傳 null
+        return null;
+      }
+    }
+
+    const decodeBtn = document.getElementById('decodeBtn');
+    const showCleanBtn = document.getElementById('showCleanBtn');
+    const b64area = document.getElementById('b64');
+    const decodedPre = document.getElementById('decoded');
+    const cleanArea = document.getElementById('clean');
+
+    decodeBtn.addEventListener('click', () => {
+      const raw = b64area.value || '';
+      const cleaned = cleanBase64(raw);
+      cleanArea.value = cleaned;
+
+      if(!cleaned){
+        decodedPre.textContent = '清理後字串為空，請確認你貼入了 Base64 內容。';
+        return;
+      }
+
+      // 嘗試解碼
+      const result = b64DecodeUnicode(cleaned);
+      if(result === null){
+        decodedPre.textContent = '解碼失敗：Base64 格式或內容錯誤（或被污染）。\n\n建議：\n  1) 檢查是否有西里爾字母或看似類似但不同的字元（例如 Ø => O, М => M 等）。\n  2) 若你願意，貼上原始未清理的字串，我可以幫你嘗試替換常見錯字後再解碼。';
+      } else {
+        // 成功：顯示結果（若是腳本，會以預格式化方式顯示）
+        decodedPre.textContent = result;
+      }
+    });
+
+    showCleanBtn.addEventListener('click', ()=>{
+      const cleaned = cleanBase64(b64area.value || '');
+      cleanArea.value = cleaned || '(清理後為空)';
+    });
+
+    // 小工具：自動把文字範例放滿，並保持可視
+    (function init(){
+      cleanArea.value = '';
+      decodedPre.textContent = '尚未解碼。按「清理並嘗試解碼」開始。';
+    })();
   </script>
 </body>
 </html>
-
-
